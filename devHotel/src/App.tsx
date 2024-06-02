@@ -33,13 +33,22 @@ const App = () => {
 
   return (
     <div>
-      <h1>DevAccelerator Hotel</h1>
+      <h1>DevAccelerator Hotel</h1> 
       <RoomList rooms={rooms} onSelectRoom={setSelectedRoom} />
       {selectedRoom && (
         <div>
           <h2>Selected Room: {selectedRoom.type}</h2>
           <h3>Price: ${selectedRoom.price}</h3>
-          <h3>Number of Days: {numDays}</h3>
+          {/* used to add # of days to the total price calculation*/}
+          <label>
+            Number of days:
+            <input
+              type="number"
+              value={numDays}
+              onChange={(e) => setNumDays(Number(e.target.value))}
+              min="1"
+            />
+          </label>
           <h3>Total Price: ${calculateTotalPrice()}</h3>
         </div>
       )}

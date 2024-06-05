@@ -1,0 +1,8 @@
+.room-image {
+    width: 100%;
+    height: auto;
+    max-width: 300px; /* Adjust the max-width to your preference */
+    border-radius: 8px; /* Optional: to add rounded corners */
+    margin-bottom: 10px; /* Optional: to add some space below the image */
+  }
+  

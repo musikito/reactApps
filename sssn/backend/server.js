@@ -5,8 +5,8 @@ const bcrypt = require('bcryptjs');
 const mysql = require('mysql2');
 const cors = require("cors")
 
+/** Middleware */
 const app = express();
-// use cors middleware
 app.use(cors());
 app.use(bodyParser.json());
 

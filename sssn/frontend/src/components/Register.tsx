@@ -1,11 +1,20 @@
-import axios from "axios";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Form, Button } from "react-bootstrap";
+import axios from "axios";
 
-const Register = () => {
+// Interface for the Register Props
+interface RegisterProps {
+  // To check if user is logged in
+  setAuth: (auth: boolean) => void;
+}
+
+const Register = ({ setAuth }: RegisterProps) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
     const [fullName, setFullName] = useState('');
+  const navigate = useNavigate();
   
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -17,45 +26,63 @@ const Register = () => {
           email,
           fullName,
         });
+      setAuth(true);
+      navigate("/home");
         console.log(response.data);
       } catch (error) {
+      alert("Registration failed");
         console.error(error);
       }
     };
   
     return (
-      <form onSubmit={handleSubmit}>
-        <h2>Register</h2>
-        <input
+      <Form onSubmit={handleSubmit}>
+        {/** Username group*/}
+      <Form.Group className="mb-3" controlId="username">
+        <Form.Label>Username</Form.Label>
+        <Form.Control
           type="text"
-          placeholder="Username"
+          placeholder="Enter username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          required
         />
-        <input
+      </Form.Group>
+      {/** Password group */}
+      <Form.Group className="mb-3" controlId="password">
+        <Form.Label>Password</Form.Label>
+        <Form.Control
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          required
         />
-        <input
+      </Form.Group>
+      {/** Email group */}
+      <Form.Group className="mb-3" controlId="email">
+        <Form.Label>Email address</Form.Label>
+        <Form.Control
           type="email"
-          placeholder="Email"
+          placeholder="Enter email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          required
         />
-        <input
+      </Form.Group>
+      {/** Full Name group */}
+      <Form.Group className="mb-3" controlId="fullName">
+        <Form.Label>Full Name</Form.Label>
+        <Form.Control
           type="text"
-          placeholder="Full Name"
+          placeholder="Enter Full Name"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
         />
-        <button type="submit">Register</button>
-      </form>
+      </Form.Group>
+      {/** Submit button  */}
+      <Button variant="primary" type="submit">
+        Register
+      </Button>
+      </Form>
     );
   };
 
-export default Register
+export default Register;

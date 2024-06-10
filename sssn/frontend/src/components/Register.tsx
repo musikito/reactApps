@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 interface RegisterProps {
-  setAuth: (user: unknown) => void;
+  setAuth: (user: any) => void;
 }
 
 const Register: React.FC<RegisterProps> = ({ setAuth }) => {

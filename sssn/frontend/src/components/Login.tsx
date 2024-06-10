@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 interface LoginProps {
-  setAuth: (user: unknown) => void;
+  setAuth: (user: any) => void;
 }
 
 const Login: React.FC<LoginProps> = ({ setAuth }) => {

@@ -14,12 +14,13 @@ const TweetForm: React.FC<TweetFormProps> = ({ addTweet, userId, username }) => 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const date = new Date().toISOString();
     try {
       const response = await axios.post('http://localhost:3000/tweets', {
         userId,
         content,
       });
-      addTweet(userId, username, response.data.content, response.data.date);
+      addTweet(userId, username, response.data.content, date);
       setContent('');
       setError('');
     } catch (error) {

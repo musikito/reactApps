@@ -147,6 +147,18 @@ app.post('/tweets/:id/dislike', async (req, res) => {
   }
 });
 
+// Get tweets by user ID
+app.get('/tweets/user/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const [results] = await pool.query('SELECT * FROM Posts WHERE user_id = ?', [userId]);
+    res.status(200).json(results);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

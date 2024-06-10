@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 const cors = require("cors")
 
 /** Middleware */
@@ -10,7 +10,6 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// Create the pool to connect to the database
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -27,16 +26,6 @@ app.post('/register', async (req, res) => {
   const { username, password, email, fullName } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // pool.query(
-  //   'INSERT INTO Users (username, hashed_password, email, full_name) VALUES (?, ?, ?, ?)',
-  //   [username, hashedPassword, email, fullName],
-  //   (error, results) => {
-  //     if (error) {
-  //       return res.status(400).json({ error: error.message });
-  //     }
-  //     res.status(201).json({ id: results.insertId, username, email, fullName });
-  //   }
-  // );
   try {
     const [results] = await pool.query(
       'INSERT INTO Users (username, hashed_password, email, full_name) VALUES (?, ?, ?, ?)',
@@ -52,22 +41,6 @@ app.post('/register', async (req, res) => {
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
-  // pool.query(
-  //   'SELECT * FROM Users WHERE username = ?',
-  //   [username],
-  //   async (error, results) => {
-  //     if (error) {
-  //       return res.status(400).json({ error: error.message });
-  //     }
-  //     const user = results[0];
-
-  //     if (user && await bcrypt.compare(password, user.hashed_password)) {
-  //       res.json({ message: 'Login successful', user });
-  //     } else {
-  //       res.status(401).json({ error: 'Invalid username or password' });
-  //     }
-  //   }
-  // );
   try {
     const [results] = await pool.query('SELECT * FROM Users WHERE username = ?', [username]);
     const user = results[0];
@@ -80,97 +53,100 @@ app.post('/login', async (req, res) => {
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
-
 });
 
-// Add post endpoint
-app.post('/add-post', async (req, res) => {
-  const { user_id, content } = req.body;
+// Add tweet endpoint
+app.post('/tweets', async (req, res) => {
+  const { userId, content } = req.body;
+  console.log(req.body);
 
   try {
     const [results] = await pool.query(
       'INSERT INTO Posts (user_id, content) VALUES (?, ?)',
-      [user_id, content]
+      [userId, content]
     );
-    return res.status(201).json({ message: 'Post added' });
+    const tweetId = results.insertId;
+    const date = new Date().toISOString();
+    res.status(201).json({ id: tweetId, userId, content, date });
   } catch (error) {
-    return res.status(400).json({ error: error.message });
+    res.status(400).json({ error: error.message });
   }
 });
 
-// Get all posts endpoint
-app.get('/get-posts', async (req, res) => {
+// Get all tweets
+app.get('/tweets', async (req, res) => {
   try {
-    const [results] = await pool.query("SELECT * FROM Posts");
-    res.json(results);
-  } catch (error) {
-    return res.status(400).json({ error: error.message });
-  }
-  // pool.query('SELECT * FROM Posts', (error, results) => {
-  //   if (error) {
-  //     return res.status(400).json({ error: error.message });
-  //   }
-  //   res.json(results);
-  // });
-});
-
-// Get post by id endpoint
-app.get('/get-post/:id', async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const [results] = await pool.query("SELECT * FROM Posts WHERE id =?", [id]);
-    if (results.lenght === 0) {
-      return res.status(404).json({ error: "Post not found" });
-    }
+    const [results] = await pool.query('SELECT * FROM Posts');
     res.json(results);
   } catch (error) {
     res.status(400).json({ error: error.message });
-
   }
-  // pool.query('SELECT * FROM Posts WHERE id =?', [id], (error, results) => {
-  //   if (error) {
-  //     return res.status(400).json({ error: error.message });
-  //   }
-  //   res.json(results);
-  // });
 });
 
-// Get all users endpoint
-app.get('/get-users', async (req, res) => {
-  try {
-    const [results] = await pool.query("SELECT * FROM Users");
-    res.json(results);
-  } catch (error) {
-    return res.status(400).json({ error: error.message });
-  }
-  // pool.query('SELECT * FROM Users', (error, results) => {
-  //   if (error) {
-  //     return res.status(400).json({ error: error.message });
-  //   }
-  //   res.json(results);
-  // });
-});
-
-// Get user by id endpoint
-app.get('/get-user/:id', async (req, res) => {
+// Get tweet by ID
+app.get('/tweets/:id', async (req, res) => {
   const { id } = req.params;
+
   try {
-    const [results] = await pool.query("SELECT * FROM Users WHERE id =?", [id]);
-    if (results.lenght === 0) {
-      return res.status(404).json({ error: "User not found" });
+    const [results] = await pool.query('SELECT * FROM Posts WHERE id = ?', [id]);
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'Tweet not found' });
     }
+    res.json(results[0]);
   } catch (error) {
     res.status(400).json({ error: error.message });
-
   }
-  // pool.query('SELECT * FROM Users WHERE id =?', [id], (error, results) => {
-  //   if (error) {
-  //     return res.status(400).json({ error: error.message });
-  //   }
-  //   res.json(results);
-  // });
 });
+
+// Get all users
+app.get('/users', async (req, res) => {
+  try {
+    const [results] = await pool.query('SELECT * FROM Users');
+    res.json(results);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Get user by ID
+app.get('/users/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [results] = await pool.query('SELECT * FROM Users WHERE id = ?', [id]);
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(results[0]);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Like tweet endpoint
+app.post('/tweets/:id/like', async (req, res) => {
+  const tweetId = req.params.id;
+
+  try {
+    await pool.query('UPDATE Posts SET like_count = like_count + 1 WHERE id = ?', [tweetId]);
+    res.status(200).json({ message: 'Tweet liked' });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Dislike tweet endpoint
+app.post('/tweets/:id/dislike', async (req, res) => {
+  const tweetId = req.params.id;
+
+  try {
+    await pool.query('UPDATE Posts SET dislike_count = dislike_count + 1 WHERE id = ?', [tweetId]);
+    res.status(200).json({ message: 'Tweet disliked' });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

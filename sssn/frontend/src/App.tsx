@@ -1,78 +1,79 @@
-import  { useState } from 'react';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
-import PostForm from "./components/PostForm";
-import PostList from "./components/PostList";
-import Login from "./components/Login";
-import Register from "./components/Register";
-import { Router } from 'react-router-dom';
+import TweetList from './components/TweetList';
+import TweetForm from './components/TweetForm';
+import Login from './components/Login';
+import Register from './components/Register';
+import AllTweets from './components/AllTweets';
+import AllUsers from './components/AllUsers';
 
-// Post interface
-interface Post {
+interface Tweet {
   id: number;
   username: string;
   content: string;
   date: string;
+  like_count: number;
+  dislike_count: number;
 }
 
+const App: React.FC = () => {
+  const [tweets, setTweets] = useState<Tweet[]>([]);
+  const [auth, setAuth] = useState<boolean>(false);
+  const [userId, setUserId] = useState<number | null>(null);
+  const [username, setUsername] = useState<string>('');
 
-const App = () => {
-  const [posts, setPosts] = useState<Post[]>([]); // State of the POSTS
-  const [authenticated, setAuthenticated] = useState<boolean>(false); // State of the AUTHENTICATED
-
-  // Add Post function
-  const addPost = (username: string, content: string) => {
-    const newPost: Post = {
-      id: posts.length + 1,
+  const addTweet = (userId: number, username: string, content: string, date: string) => {
+    const newTweet = {
+      id: tweets.length + 1,
       username,
       content,
-      date: new Date().toLocaleString(),
-    }; // End of newPost function
-    setPosts([...posts, newPost]); // Add new post to the posts state
-  }; // End of addPost function
+      date,
+      like_count: 0,
+      dislike_count: 0,
+    };
+    setTweets([newTweet, ...tweets]);
+  };
 
+  const updateTweet = (updatedTweet: Tweet) => {
+    setTweets(tweets.map((tweet) => (tweet.id === updatedTweet.id ? updatedTweet : tweet)));
+  };
+
+  const handleLogin = (user: any) => {
+    setAuth(true);
+    setUserId(user.id);
+    setUsername(user.username);
+  };
 
   return (
     <Router>
-    <Container>
-      <Row>
-        <Col>
-          <h1>Welcome to the React + Node.js Super Simple Social Media App</h1>
-          <p>
-            This is a simple social media app built using React and Node.js.
-          </p>
-          <p>
-            It is a single-page app (SPA) that uses React Router to navigate
-            between different pages.
-          </p>
-          <p>
-            The backend API is built using Express.js and MYSQL.
-          </p>
-          <p>
-            The frontend is built using React and Bootstrap.
-          </p>
-        </Col>
-      </Row>
-      <Row>
-        <Col md={{ span: 6, offset: 3 }}>
-          <Login />
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <Register />
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <PostForm addPost={addPost} />
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <PostList posts={posts} />
-        </Col>
-      </Row>
-    </Container>
+      <Container>
+        <Row>
+          <Col md={{ span: 6, offset: 3 }}>
+            <h1 className="text-center my-4">Twitter Clone</h1>
+            <Routes>
+              <Route path="/login" element={<Login setAuth={handleLogin} />} />
+              <Route path="/register" element={<Register setAuth={handleLogin} />} />
+              <Route
+                path="/tweets"
+                element={
+                  auth ? (
+                    <>
+                      <TweetForm addTweet={addTweet} userId={userId as number} username={username} />
+                      <TweetList tweets={tweets} updateTweet={updateTweet} />
+                    </>
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                }
+              />
+              <Route path="/all-tweets" element={<AllTweets />} />
+              <Route path="/all-users" element={<AllUsers />} />
+              <Route path="*" element={<Navigate to="/login" />} />
+            </Routes>
+          </Col>
+        </Row>
+      </Container>
     </Router>
   );
 };

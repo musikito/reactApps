@@ -1,88 +1,86 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Form, Button } from "react-bootstrap";
-import axios from "axios";
+import React, { useState } from 'react';
+import { Form, Button } from 'react-bootstrap';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-// Interface for the Register Props
 interface RegisterProps {
-  // To check if user is logged in
-  setAuth: (auth: boolean) => void;
+  setAuth: (user: unknown) => void;
 }
 
-const Register = ({ setAuth }: RegisterProps) => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [email, setEmail] = useState('');
-    const [fullName, setFullName] = useState('');
+const Register: React.FC<RegisterProps> = ({ setAuth }) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [fullName, setFullName] = useState('');
   const navigate = useNavigate();
-  
-    const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-  
-      try {
-        const response = await axios.post('http://localhost:3000/register', {
-          username,
-          password,
-          email,
-          fullName,
-        });
-      setAuth(true);
-      navigate("/home");
-        console.log(response.data);
-      } catch (error) {
-      alert("Registration failed");
-        console.error(error);
-      }
-    };
-  
-    return (
-      <Form onSubmit={handleSubmit}>
-        {/** Username group*/}
-      <Form.Group className="mb-3" controlId="username">
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('http://localhost:3000/register', {
+        username,
+        password,
+        email,
+        fullName,
+      });
+      setAuth(response.data);
+      navigate('/tweets');
+    } catch (error) {
+      alert('Failed to register');
+    }
+  };
+
+  return (
+    <Form onSubmit={handleSubmit}>
+      <Form.Group controlId="username">
         <Form.Label>Username</Form.Label>
         <Form.Control
           type="text"
           placeholder="Enter username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          required
         />
       </Form.Group>
-      {/** Password group */}
-      <Form.Group className="mb-3" controlId="password">
+
+      <Form.Group controlId="password">
         <Form.Label>Password</Form.Label>
         <Form.Control
           type="password"
-          placeholder="Password"
+          placeholder="Enter password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
       </Form.Group>
-      {/** Email group */}
-      <Form.Group className="mb-3" controlId="email">
-        <Form.Label>Email address</Form.Label>
+
+      <Form.Group controlId="email">
+        <Form.Label>Email</Form.Label>
         <Form.Control
           type="email"
           placeholder="Enter email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
         />
       </Form.Group>
-      {/** Full Name group */}
-      <Form.Group className="mb-3" controlId="fullName">
+
+      <Form.Group controlId="fullName">
         <Form.Label>Full Name</Form.Label>
         <Form.Control
           type="text"
-          placeholder="Enter Full Name"
+          placeholder="Enter full name"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
+          required
         />
       </Form.Group>
-      {/** Submit button  */}
+
       <Button variant="primary" type="submit">
         Register
       </Button>
-      </Form>
-    );
-  };
+    </Form>
+  );
+};
 
 export default Register;

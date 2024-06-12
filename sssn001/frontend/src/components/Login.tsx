@@ -3,31 +3,23 @@ import { Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-interface RegisterProps {
+interface LoginProps {
   setAuth: (user: any) => void;
 }
 
-const Register: React.FC<RegisterProps> = ({ setAuth }) => {
+const Login: React.FC<LoginProps> = ({ setAuth }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [email, setEmail] = useState('');
-  const [fullName, setFullName] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3000/register', {
-        username,
-        password,
-        email,
-        fullName,
-      });
-      setAuth(response.data);
-      console.log(response.data);
+      const response = await axios.post('http://localhost:3000/login', { username, password });
+      setAuth(response.data.user);
       navigate('/tweets');
-    } catch (error) { 
-      alert('Failed to register');
+    } catch (error) {
+      alert('Failed to log in');
     }
   };
 
@@ -55,33 +47,11 @@ const Register: React.FC<RegisterProps> = ({ setAuth }) => {
         />
       </Form.Group>
 
-      <Form.Group controlId="email">
-        <Form.Label>Email</Form.Label>
-        <Form.Control
-          type="email"
-          placeholder="Enter email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-      </Form.Group>
-
-      <Form.Group controlId="fullName">
-        <Form.Label>Full Name</Form.Label>
-        <Form.Control
-          type="text"
-          placeholder="Enter full name"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          required
-        />
-      </Form.Group>
-
       <Button variant="primary" type="submit">
-        Register
+        Login
       </Button>
     </Form>
   );
 };
 
-export default Register;
+export default Login;

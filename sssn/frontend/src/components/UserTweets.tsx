@@ -36,12 +36,25 @@ const UserTweets: React.FC = () => {
     fetchUserTweets();
   }, [userId]);
 
+  /**
+   * Handles liking a tweet by sending a POST request to the server and updating the like count in the local state.
+   *
+   * @param tweetId - The ID of the tweet to be liked.
+   * @returns Promise<void> - A Promise that resolves when the like operation is complete.
+   * @throws {Error} - Throws an error if the like operation fails.
+   */
   const handleLike = async (tweetId: number) => {
     try {
       await axios.post(`http://localhost:3000/tweets/${tweetId}/like`);
-      setTweets(tweets.map((tweet) => (tweet.id === tweetId ? { ...tweet, like_count: tweet.like_count + 1 } : tweet)));
+      setTweets(
+        tweets.map((tweet) =>
+          tweet.id === tweetId
+            ? { ...tweet, like_count: tweet.like_count + 1 }
+            : tweet
+        )
+      );
     } catch (error) {
-      alert('Failed to like tweet');
+      alert("Failed to like tweet");
     }
   };
 

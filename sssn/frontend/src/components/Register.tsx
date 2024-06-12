@@ -24,8 +24,9 @@ const Register: React.FC<RegisterProps> = ({ setAuth }) => {
         fullName,
       });
       setAuth(response.data);
+      console.log(response.data);
       navigate('/tweets');
-    } catch (error) {
+    } catch (error) { 
       alert('Failed to register');
     }
   };

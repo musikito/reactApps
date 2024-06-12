@@ -20,7 +20,7 @@ const TweetForm: React.FC<TweetFormProps> = ({ addTweet, userId, username }) => 
         userId,
         content,
       });
-      addTweet(userId, username, response.data.content, date);
+      addTweet(userId, username, response.data.content, response.data.date);
       setContent('');
       setError('');
     } catch (error) {

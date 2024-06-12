@@ -10,6 +10,8 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+
+// connect to the Database
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -73,10 +75,35 @@ app.post('/tweets', async (req, res) => {
   }
 });
 
+// Get home tweets
+app.get('/tweets/home', async (req, res) => {
+  try {
+    const [results] = await pool.query('SELECT * FROM Posts ORDER BY posts.created_at DESC');
+    console.log('resultados',results);
+    res.json(results);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+
 // Get all tweets
 app.get('/tweets', async (req, res) => {
+  // const query = `
+  //   SELECT tweets.id, tweets.user_id, tweets.content, tweets.date, tweets.like_count, tweets.dislike_count, users.username
+  //   FROM tweets
+  //   JOIN users ON tweets.user_id = users.id
+  //   ORDER BY tweets.date ASC
+  // `;
+
+  // db.query(query, (err, results) => {
+  //   if (err) {
+  //     return res.status(500).json({ message: 'Database error', error: err });
+  //   }
+  //   res.json(results);
+  // });
   try {
-    const [results] = await pool.query('SELECT * FROM Posts');
+    const [results] = await pool.query('SELECT * FROM Posts JOIN users ON posts.user_id = users.id ORDER BY posts.created_at DESC');
     res.json(results);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -114,6 +141,7 @@ app.get('/users/:id', async (req, res) => {
 
   try {
     const [results] = await pool.query('SELECT * FROM Users WHERE id = ?', [id]);
+    
     if (results.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -152,7 +180,12 @@ app.get('/tweets/user/:userId', async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const [results] = await pool.query('SELECT * FROM Posts WHERE user_id = ?', [userId]);
+    const [results] = await pool.query(
+      "select * from posts JOIN users ON posts.user_id = users.id where user_id = ?",
+      [userId]
+    );
+    // const [results] = await pool.query('SELECT * FROM Posts WHERE user_id = ?', [userId]);
+    // console.log("resultados del user", results);
     res.status(200).json(results);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -160,7 +193,7 @@ app.get('/tweets/user/:userId', async (req, res) => {
 });
 
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

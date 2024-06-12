@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Tab, Tabs, Container, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import Login from './Login';
 import Register from './Register';
 
 interface AuthProps {
-  setAuth: (user: any) => void;
+  setAuth: (user) => void;
 }
 
-const Auth: React.FC<AuthProps> = ({ setAuth }) => {
-  const [key, setKey] = useState<string>('login');
+const Auth = ({ setAuth }: AuthProps) => {
+  const [key, setKey] = useState<string>("login");
   const navigate = useNavigate();
 
-  const handleAuth = (user: any) => {
+  const handleAuth = (user) => {
     setAuth(user);
-    navigate('/tweets');
+    navigate("/tweets/home");
   };
 
   return (

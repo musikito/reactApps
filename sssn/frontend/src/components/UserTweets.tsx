@@ -23,7 +23,7 @@ const UserTweets: React.FC = () => {
       try {
         const response = await axios.get(`http://localhost:3000/tweets/user/${userId}`);
         setTweets(response.data);
-        console.log(response.data);
+        // console.log('todo tewwts',response.data);
         
         if (response.data.length > 0) {
           setUsername(response.data[0].username);
@@ -56,7 +56,7 @@ const UserTweets: React.FC = () => {
 
   return (
     <div>
-      <h2>{username}'s Tweets</h2>
+      <h2>All { username }'s Tweets</h2>
       <ListGroup>
         {tweets.map((tweet) => (
           <ListGroup.Item key={tweet.id}>

@@ -10,6 +10,7 @@ function HeaderBox({ type = "title", title, user, subtext }: HeaderBoxProps) {
                     </span>
                 )}
             </h1>
+            <p className='header-box-subtext'>{subtext}</p>
 
         </div>
     )

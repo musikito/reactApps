@@ -89,19 +89,7 @@ app.get('/tweets/home', async (req, res) => {
 
 // Get all tweets
 app.get('/tweets', async (req, res) => {
-  // const query = `
-  //   SELECT tweets.id, tweets.user_id, tweets.content, tweets.date, tweets.like_count, tweets.dislike_count, users.username
-  //   FROM tweets
-  //   JOIN users ON tweets.user_id = users.id
-  //   ORDER BY tweets.date ASC
-  // `;
 
-  // db.query(query, (err, results) => {
-  //   if (err) {
-  //     return res.status(500).json({ message: 'Database error', error: err });
-  //   }
-  //   res.json(results);
-  // });
   try {
     const [results] = await pool.query('SELECT * FROM Posts JOIN users ON posts.user_id = users.id ORDER BY posts.created_at DESC');
     res.json(results);
@@ -158,6 +146,7 @@ app.post('/tweets/:id/like', async (req, res) => {
   try {
     await pool.query('UPDATE Posts SET like_count = like_count + 1 WHERE id = ?', [tweetId]);
     res.status(200).json({ message: 'Tweet liked' });
+    console.log("Tweet liked");
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -170,6 +159,7 @@ app.post('/tweets/:id/dislike', async (req, res) => {
   try {
     await pool.query('UPDATE Posts SET dislike_count = dislike_count + 1 WHERE id = ?', [tweetId]);
     res.status(200).json({ message: 'Tweet disliked' });
+    console.log("Tweet disliked");
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

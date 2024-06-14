@@ -21,8 +21,10 @@ interface TweetListProps {
 const TweetList: React.FC<TweetListProps> = ({ tweets, updateTweet }) => {
   const handleLike = async (tweetId: number) => {
     try {
+      
       await axios.post(`http://localhost:3000/tweets/${tweetId}/like`);
       const updatedTweet = tweets.find((tweet) => tweet.id === tweetId);
+      console.log("updatedTweet", updatedTweet);
       if (updatedTweet) {
         updateTweet({ ...updatedTweet, like_count: updatedTweet.like_count + 1 });
       }

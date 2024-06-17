@@ -2,7 +2,7 @@ import HeaderBox from '@/components/HeaderBox'
 import TotalBalanceBox from '@/components/TotalBalanceBox';
 import React from 'react'
 
-function Home() {
+const Home = () => {
 
   const loggedIn = { firstName: 'Jose' };
   return (

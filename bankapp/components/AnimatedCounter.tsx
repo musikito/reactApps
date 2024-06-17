@@ -2,7 +2,7 @@
 import React from 'react'
 import CountUp from 'react-countup'
 
-function AnimatedCounter({ amount }: { amount: number }) {
+const AnimatedCounter = ({ amount }: { amount: number }) =>{
     return (
     <div className="w-full flex justify-center items-center">
             <CountUp
